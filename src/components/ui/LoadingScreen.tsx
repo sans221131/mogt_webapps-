@@ -1,60 +1,89 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { MogtLogo } from "@/components/ui/MogtLogo";
+import { useReducedMotion } from "framer-motion";
+import AnimatedMogtLogo from "@/components/ui/AnimatedMogtLogo";
+
+const MIN_VISIBLE_MS = 2200;
+const EXIT_MS = 420;
+const REMOVE_BUFFER_MS = 120;
+const MAX_WAIT_MS = 7000;
 
 export default function LoadingScreen() {
+  const reduceMotion = useReducedMotion();
   const [visible, setVisible] = useState(true);
   const [render, setRender] = useState(true);
 
   useEffect(() => {
+    const startedAt = performance.now();
+
     let hideTimeout: number | undefined;
+    let forceTimeout: number | undefined;
     let removeTimeout: number | undefined;
+    let isFinished = false;
 
     const finish = () => {
-      // start fade-out
+      if (isFinished) return;
+      isFinished = true;
+
+      // Start simple exit fade, then unmount right after it completes.
       setVisible(false);
-      // remove from DOM after transition (400ms + small buffer)
-      removeTimeout = window.setTimeout(() => setRender(false), 520);
+      removeTimeout = window.setTimeout(
+        () => setRender(false),
+        reduceMotion ? 0 : EXIT_MS + REMOVE_BUFFER_MS,
+      );
+    };
+
+    const finishAfterMinDuration = () => {
+      const elapsed = performance.now() - startedAt;
+      const remaining = Math.max(MIN_VISIBLE_MS - elapsed, 0);
+
+      if (hideTimeout) window.clearTimeout(hideTimeout);
+      hideTimeout = window.setTimeout(finish, remaining);
+    };
+
+    const onLoad = () => {
+      finishAfterMinDuration();
     };
 
     if (document.readyState === "complete") {
-      // Page already loaded — short delay to show animation entry
-      hideTimeout = window.setTimeout(finish, 600);
+      // If page is already loaded, still respect a minimum display duration.
+      finishAfterMinDuration();
     } else {
-      // Wait for window load event or fallback
-      const onLoad = () => {
-        hideTimeout = window.setTimeout(finish, 300);
-      };
-      window.addEventListener("load", onLoad);
-      // safety fallback
-      hideTimeout = window.setTimeout(() => {
-        finish();
-        window.removeEventListener("load", onLoad);
-      }, 3000);
+      // Wait for window load, then finish after the minimum duration.
+      window.addEventListener("load", onLoad, { once: true });
     }
+
+    // Safety fallback in case load event is delayed or blocked.
+    forceTimeout = window.setTimeout(finish, MAX_WAIT_MS);
 
     return () => {
       if (hideTimeout) window.clearTimeout(hideTimeout);
+      if (forceTimeout) window.clearTimeout(forceTimeout);
       if (removeTimeout) window.clearTimeout(removeTimeout);
+      window.removeEventListener("load", onLoad);
     };
-  }, []);
+  }, [reduceMotion]);
 
   if (!render) return null;
 
   return (
     <div
-      aria-hidden={!visible}
+      aria-hidden
       role="presentation"
-      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-[#F9F8F6] transition-opacity duration-400`}
+      className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden bg-[#F9F8F6]"
       style={{
         opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(16px)",
-        transition: "opacity 400ms cubic-bezier(0.16, 1, 0.3, 1), transform 400ms cubic-bezier(0.16, 1, 0.3, 1)",
+        transition: reduceMotion ? "none" : `opacity ${EXIT_MS}ms cubic-bezier(0.16, 1, 0.3, 1)`,
       }}
     >
       <div className="flex items-center justify-center">
-        <MogtLogo className="h-16 w-auto md:h-20" alt="MOGT loading logo" />
+        <AnimatedMogtLogo
+          className="h-40 w-40 md:h-56 md:w-56"
+          decorative={false}
+          alt="MOGT loading logo"
+          enableIdle={false}
+        />
       </div>
     </div>
   );
