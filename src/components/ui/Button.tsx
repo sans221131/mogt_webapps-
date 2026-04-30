@@ -21,7 +21,7 @@ type NativeButtonProps = CommonButtonProps &
 export type ButtonProps = LinkButtonProps | NativeButtonProps;
 
 const baseClasses =
-	"inline-flex items-center justify-center rounded-md font-sans text-sm font-medium tracking-[0.01em] transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]";
+	"group inline-flex items-center justify-center rounded-md font-sans text-sm font-medium tracking-[0.01em] transition-colors duration-150 transform-gpu will-change-transform transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]";
 
 const variantClasses: Record<ButtonVariant, string> = {
 	primary: "bg-[#0A0A0A] px-6 py-3 text-[#F9F8F6] hover:bg-[#1A1A1A]",

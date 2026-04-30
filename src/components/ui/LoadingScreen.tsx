@@ -26,11 +26,32 @@ export default function LoadingScreen() {
       if (isFinished) return;
       isFinished = true;
 
+      // If reduced motion requested, unmount immediately but still signal ready.
+      if (reduceMotion) {
+        try {
+          (window as any).__MOGT_LOADER_FINISHED = true;
+          window.dispatchEvent(new Event("mogt:loaderFinished"));
+        } catch (e) {
+          /* ignore */
+        }
+        setRender(false);
+        return;
+      }
+
       // Start simple exit fade, then unmount right after it completes.
       setVisible(false);
       removeTimeout = window.setTimeout(
-        () => setRender(false),
-        reduceMotion ? 0 : EXIT_MS + REMOVE_BUFFER_MS,
+        () => {
+          // signal other components (hero) that loader finished so they can start their animations
+          try {
+            (window as any).__MOGT_LOADER_FINISHED = true;
+            window.dispatchEvent(new Event("mogt:loaderFinished"));
+          } catch (e) {
+            /* ignore */
+          }
+          setRender(false);
+        },
+        EXIT_MS + REMOVE_BUFFER_MS,
       );
     };
 
