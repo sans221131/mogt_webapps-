@@ -152,18 +152,18 @@ export function HeroSection() {
 		reducedMotion ? { duration: 0 } : { duration: 0.26, ease: [0.22, 1, 0.36, 1] as const };
 
 	return (
-		<section
-			className="mogt-hero relative isolate min-h-[calc(100svh-72px)] overflow-hidden lg:h-[calc(100svh-72px)] lg:max-h-[calc(100svh-72px)]"
-			id="home"
-			onMouseMove={handleHeroMouseMove}
-			style={sectionStyle}
-		>
+			<section
+				className="mogt-hero relative isolate min-h-[100svh] overflow-hidden"
+				id="home"
+				onMouseMove={handleHeroMouseMove}
+				style={sectionStyle}
+			>
 			<div aria-hidden="true" className="absolute inset-0 -z-20 bg-[#F7F6F2]" />
 			<div aria-hidden="true" className="mogt-grid absolute inset-0 -z-10" />
 			<div aria-hidden="true" className="mogt-spotlight absolute inset-0 -z-10" />
 			<div aria-hidden="true" className="mogt-depth absolute -right-40 top-16 -z-10 h-[34rem] w-[34rem] rounded-full" />
 
-			<div className="hero-shell mx-auto grid h-full w-full max-w-[1200px] grid-cols-1 gap-4 px-4 py-4 md:px-8 md:py-5 lg:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)] lg:items-center lg:px-12 lg:py-6">
+				<div className="hero-shell mx-auto grid min-h-[100svh] w-full max-w-[1200px] grid-cols-1 content-end gap-6 px-4 pt-28 pb-[50px] md:px-8 md:pt-32 md:pb-[50px] lg:grid-cols-2 lg:items-center lg:gap-10 lg:px-12 lg:pt-28 lg:pb-[50px]">
 				<div className="w-full max-w-none lg:max-w-[620px]">
 					<div className={`hero-item ${isReady ? "is-ready" : ""}`} style={{ animationDelay: "80ms" }}>
 						<p className="hero-eyebrow inline-flex items-center gap-3">
@@ -173,12 +173,12 @@ export function HeroSection() {
 						</p>
 					</div>
 
-					<h1 className="hero-heading mt-3 max-w-[560px] lg:pr-6 font-display text-[clamp(1.9rem,3.4vw,3.6rem)] font-semibold leading-[1.08] tracking-[-0.036em] text-[#050505]">
-						<span className={`hero-item block ${isReady ? "is-ready" : ""}`} style={{ animationDelay: "180ms" }}>
-							MOGT builds custom web apps
+					<h1 className="hero-heading mt-3 max-w-[560px] lg:max-w-[900px] lg:pr-6 font-display text-[clamp(1.9rem,3.4vw,3.6rem)] font-semibold leading-[1.08] tracking-[-0.036em] text-[#050505]">
+						<span className={`hero-item inline ${isReady ? "is-ready" : ""}`} style={{ animationDelay: "180ms" }}>
+							Custom web apps for teams that have outgrown{' '}
 						</span>
-						<span className={`hero-item block ${isReady ? "is-ready" : ""}`} style={{ animationDelay: "280ms" }}>
-							for operations-heavy teams.
+						<span className={`hero-item inline ${isReady ? "is-ready" : ""}`} style={{ animationDelay: "280ms" }}>
+							spreadsheets.
 						</span>
 					</h1>
 
@@ -188,7 +188,7 @@ export function HeroSection() {
 						}`}
 						style={{ animationDelay: "320ms" }}
 					>
-						We replace spreadsheets, manual workflows, and patchwork tools with clean, role-aware systems.
+						We replace manual workflows and patchwork tools with clean, role-aware systems.
 					</p>
 
 					<p
@@ -598,9 +598,9 @@ export function HeroSection() {
 				}
 
 				.mogt-tab.is-active {
-					background: #ffffff;
-					border-color: rgba(0, 0, 0, 0.2);
-					color: #050505;
+					background: #050505;
+					border-color: #050505;
+					color: #ffffff;
 				}
 
 				.mogt-module-card {
@@ -807,7 +807,7 @@ export function HeroSection() {
 					.hero-shell {
 						gap: 1rem;
 						padding-top: 1rem;
-						padding-bottom: 1rem;
+						padding-bottom: 50px;
 					}
 
 					.hero-heading {
@@ -845,7 +845,7 @@ export function HeroSection() {
 				@media (max-height: 760px) {
 					.hero-shell {
 						padding-top: 0.7rem;
-						padding-bottom: 0.7rem;
+						padding-bottom: 50px;
 					}
 
 					.hero-heading {
