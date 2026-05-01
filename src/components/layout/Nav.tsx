@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, ChevronDown, Dot, Menu, Sparkles, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { INDUSTRIES, MEGA_MENU_CTA } from "@/components/layout/megaMenuData.rich";
 import { Button } from "@/components/ui/Button";
 import { MogtLogo } from "@/components/ui/MogtLogo";
 
@@ -14,12 +15,17 @@ type SolutionItem = {
 	title: string;
 };
 
-type IndustryItem = {
+type IndustryGroupItem = {
 	description: string;
-	focus: string;
+	solutions: SolutionItem[];
+	title: string;
+};
+
+type IndustryItem = {
+	groups: IndustryGroupItem[];
+	href: string;
 	id: string;
 	label: string;
-	solutions: SolutionItem[];
 	summary: string;
 	totalSolutions: number;
 };
@@ -31,82 +37,53 @@ type WorkItem = {
 	meta: string;
 };
 
-const solutionBlueprints: Array<{ description: string; title: string }> = [
-	{ description: "Automate multi-step handoffs and approvals for {focus} teams.", title: "Workflow Automation Hub" },
-	{ description: "Give external stakeholders a clean, role-aware self-service portal.", title: "Client Portal Suite" },
-	{ description: "Protect sensitive actions with granular permissions and policy controls.", title: "Role-Based Access Control" },
-	{ description: "Track live performance with operational KPIs, filters, and drilldowns.", title: "Real-Time Analytics" },
-	{ description: "Run staged approvals with SLAs, escalations, and audit-safe outcomes.", title: "Approval Pipeline Engine" },
-	{ description: "Extract and validate incoming documents into structured business data.", title: "Document Intelligence" },
-	{ description: "Capture user events and decision history for full accountability.", title: "Audit Trail Monitor" },
-	{ description: "Manage pricing logic, invoicing, and payment status in one system.", title: "Billing and Invoicing" },
-	{ description: "Coordinate recurring tasks, dependencies, and exception handling.", title: "Task Orchestration" },
-	{ description: "Deliver contextual alerts across email, SMS, and in-app channels.", title: "Notification Center" },
-	{ description: "Connect CRMs, ERPs, and internal tools with reliable data sync.", title: "Integration Gateway" },
-	{ description: "Enforce schema and business rules before data reaches critical flows.", title: "Data Validation Layer" },
-	{ description: "Route blocked items to the right owner with timed escalation paths.", title: "SLA and Escalation Manager" },
-	{ description: "Generate branded exports, snapshots, and automated status reports.", title: "Report Composer" },
-	{ description: "Enable fast mobile workflows for teams working beyond the office.", title: "Mobile Field Console" },
-	{ description: "Embed compliance checkpoints inside everyday operational actions.", title: "Compliance Controls" },
-	{ description: "Define, validate, and version API contracts used across your stack.", title: "API Contract Studio" },
-	{ description: "Centralize SOPs, playbooks, and process guidance by team role.", title: "Knowledge Base Workspace" },
-	{ description: "Handle large intake volumes through smart queues and priority logic.", title: "Queue Management" },
-	{ description: "Predict operational bottlenecks with planning and forecast views.", title: "Forecasting Dashboard" },
-];
-
-const industrySeeds = [
-	{ description: "Financial services and banking platforms", focus: "fintech", id: "fintech", label: "FinTech", summary: "Financial services and banking platforms" },
-	{ description: "Medical and healthcare systems", focus: "health operations", id: "healthtech", label: "HealthTech", summary: "Medical workflows and care delivery systems" },
-	{ description: "Retail and marketplace operations", focus: "commerce", id: "ecommerce", label: "E-Commerce", summary: "Retail and marketplace operations" },
-	{ description: "Learning and education products", focus: "education", id: "edtech", label: "EdTech", summary: "Learning experiences and academic operations" },
-	{ description: "Fulfillment and fleet management", focus: "logistics", id: "logistics", label: "Logistics", summary: "Supply chain and dispatch intelligence" },
-	{ description: "Property and portfolio platforms", focus: "real estate", id: "realestate", label: "Real Estate", summary: "Property lifecycle and asset management" },
-	{ description: "Production and quality systems", focus: "manufacturing", id: "manufacturing", label: "Manufacturing", summary: "Production planning and quality control" },
-	{ description: "Case and compliance workflows", focus: "legal operations", id: "legaltech", label: "LegalTech", summary: "Legal workflow and compliance management" },
-	{ description: "Talent and people operations", focus: "people operations", id: "hrtech", label: "HRTech", summary: "Hiring, onboarding, and workforce systems" },
-	{ description: "Energy and sustainability tools", focus: "climate operations", id: "climatetech", label: "ClimateTech", summary: "Carbon, energy, and sustainability operations" },
-] as const;
-
-const industries: IndustryItem[] = industrySeeds.map((industry) => ({
-	...industry,
-	solutions: solutionBlueprints.map((solution) => ({
-		description: solution.description.replace("{focus}", industry.focus),
-		href: "#estimate",
-		title: solution.title,
+const industries: IndustryItem[] = INDUSTRIES.map((industry) => ({
+	groups: industry.groups.map((group) => ({
+		description: group.description,
+		solutions: group.solutions.map((solution) => ({
+			description: solution.description,
+			href: solution.href,
+			title: solution.title,
+		})),
+		title: group.title,
 	})),
-	totalSolutions: solutionBlueprints.length,
+	href: industry.href,
+	id: industry.id,
+	label: industry.name,
+	summary: industry.description,
+	totalSolutions: industry.solutionCount,
 }));
 
 const workItems: WorkItem[] = [
 	{
 		description: "Repositioned consulting site with proof-led service pages and cleaner offer flow.",
-		href: "#work",
+		href: "/#work",
 		label: "Northstar Advisory",
 		meta: "Consulting",
 	},
 	{
 		description: "Productized-service website with guided intake and stronger comparison UX.",
-		href: "#work",
+		href: "/#work",
 		label: "FieldOps Collective",
 		meta: "Operations",
 	},
 	{
 		description: "Modular finance marketing site built for inbound growth from referral-first motion.",
-		href: "#work",
+		href: "/#work",
 		label: "Ledgerline Partners",
 		meta: "Finance",
 	},
 	{
 		description: "Internal operations suite replacing spreadsheet-led request handling.",
-		href: "#work",
+		href: "/#work",
 		label: "Invyton Operations",
 		meta: "B2B Services",
 	},
 ];
 
 const staticLinks = [
-	{ href: "#process", label: "Process" },
-	{ href: "#faq", label: "FAQ" },
+	{ href: "/#process", label: "Process" },
+	{ href: "/#faq", label: "FAQ" },
 ];
 
 export function Nav() {
@@ -115,7 +92,7 @@ export function Nav() {
 	const [activeMenu, setActiveMenu] = useState<MenuId | null>(null);
 	const [isMobileOpen, setIsMobileOpen] = useState(false);
 	const [mobileMenu, setMobileMenu] = useState<MenuId | null>(null);
-	const [selectedIndustryId, setSelectedIndustryId] = useState<string>(industries[0].id);
+	const [selectedIndustryId, setSelectedIndustryId] = useState<string>(industries[0]?.id ?? "");
 
 	const selectedIndustry = useMemo(
 		() => industries.find((industry) => industry.id === selectedIndustryId) ?? industries[0],
@@ -208,7 +185,7 @@ export function Nav() {
 		setMobileMenu(null);
 		setActiveMenu((current) => (current === menu ? null : menu));
 		if (menu === "services") {
-			setSelectedIndustryId(industries[0].id);
+			setSelectedIndustryId(industries[0]?.id ?? "");
 		}
 	};
 
@@ -221,6 +198,10 @@ export function Nav() {
 		setIsMobileOpen(false);
 		setMobileMenu(null);
 	};
+
+	if (!selectedIndustry) {
+		return null;
+	}
 
 	const base =
 		"fixed inset-x-0 top-0 z-50 origin-top py-4 transition-[transform,opacity,background-color,backdrop-filter,box-shadow,border-color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform";
@@ -237,11 +218,14 @@ export function Nav() {
 	};
 
 	return (
-		<nav className={`${base} ${isSolid || activeMenu || isMobileOpen ? solidSurface : topSurface} ${isVisible ? visible : hidden}`} data-nav-shell>
+		<nav
+			className={`${base} ${isSolid || activeMenu || isMobileOpen ? solidSurface : topSurface} ${isVisible ? visible : hidden}`}
+			data-nav-shell
+		>
 			<div className="mx-auto flex max-w-[1200px] items-center justify-between px-6 md:px-10 lg:px-12">
 				<a
 					className="inline-flex items-center font-display text-base font-bold tracking-[-0.02em] text-[#0A0A0A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
-					href="#home"
+					href="/"
 					onClick={handleMenuLinkClick}
 				>
 					<MogtLogo className="h-8 w-auto md:h-10" />
@@ -286,7 +270,7 @@ export function Nav() {
 
 				<div className="flex items-center gap-2">
 					<div className="hidden lg:block">
-						<Button href="#estimate" variant="secondary">
+						<Button href="/#estimate" variant="secondary">
 							Estimate a project
 						</Button>
 					</div>
@@ -306,10 +290,7 @@ export function Nav() {
 
 			<AnimatePresence>
 				{activeMenu && (
-					<motion.div
-						{...panelMotion}
-						className="absolute inset-x-0 top-full hidden px-3 pt-3 lg:block lg:px-6"
-					>
+					<motion.div {...panelMotion} className="absolute inset-x-0 top-full hidden px-3 pt-3 lg:block lg:px-6">
 						<div className="mx-auto max-w-[1240px] overflow-hidden rounded-[20px] border border-black/10 bg-[#FCFBF8] shadow-[0_28px_80px_-46px_rgba(0,0,0,0.52)]">
 							{activeMenu === "services" ? (
 								<div className="grid grid-cols-[228px_minmax(0,1fr)] gap-0">
@@ -358,34 +339,52 @@ export function Nav() {
 											</div>
 											<a
 												className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-[#E6E5E1] px-3.5 py-2 text-[0.82rem] font-semibold tracking-[0.01em] text-[#262626] transition-colors hover:bg-[#DAD9D6]"
-												href="#services"
+												href={selectedIndustry.href}
 												onClick={handleMenuLinkClick}
 											>
-												View all solutions
+												View industry page
 												<ArrowRight className="size-4" strokeWidth={2} />
 											</a>
 										</div>
 
 										<div className="mt-4 border-t border-black/10 pt-4">
 											<div className="max-h-[430px] overflow-y-auto pr-2">
-												<div className="grid grid-cols-2 gap-2.5 xl:grid-cols-3">
-													{selectedIndustry.solutions.map((solution) => (
-														<a
-															className="group rounded-xl border border-black/10 bg-white px-3 py-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-black/20 hover:shadow-[0_14px_34px_-24px_rgba(0,0,0,0.75)]"
-															href={solution.href}
-															key={solution.title}
-															onClick={handleMenuLinkClick}
-														>
-															<p className="font-display text-[0.98rem] font-semibold leading-[1.2] tracking-[-0.01em] text-[#262626]">{solution.title}</p>
-															<p className="mt-1.5 text-[0.79rem] leading-[1.35] text-[#757575]">{solution.description}</p>
-														</a>
+												<div className="space-y-4">
+													{selectedIndustry.groups.map((group) => (
+														<div className="rounded-xl border border-black/10 bg-[#FBFAF7] p-3" key={group.title}>
+															<div className="mb-2">
+																<p className="font-display text-[1rem] font-semibold leading-[1.2] tracking-[-0.01em] text-[#1D1D1D]">{group.title}</p>
+																<p className="mt-1 text-[0.78rem] text-[#6F6F6F]">{group.description}</p>
+															</div>
+															<div className="grid grid-cols-1 gap-2.5 xl:grid-cols-2">
+																{group.solutions.map((solution) => (
+																	<a
+																		className="group rounded-xl border border-black/10 bg-white px-3 py-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-black/20 hover:shadow-[0_14px_34px_-24px_rgba(0,0,0,0.75)]"
+																		href={solution.href}
+																		key={solution.href}
+																		onClick={handleMenuLinkClick}
+																	>
+																		<p className="font-display text-[0.98rem] font-semibold leading-[1.2] tracking-[-0.01em] text-[#262626]">{solution.title}</p>
+																		<p className="mt-1.5 text-[0.79rem] leading-[1.35] text-[#757575]">{solution.description}</p>
+																	</a>
+																))}
+															</div>
+														</div>
 													))}
 												</div>
 											</div>
 										</div>
 
 										<div className="mt-4 border-t border-black/10 pt-4 text-[0.84rem] text-[#7A7A7A]">
-											Can&apos;t find what you&apos;re looking for? <a className="font-medium text-[#303030] underline decoration-[#B9B9B9] underline-offset-4" href="#estimate" onClick={handleMenuLinkClick}>Contact us</a> for custom solutions.
+											Can&apos;t find what you&apos;re looking for?{" "}
+											<a
+												className="font-medium text-[#303030] underline decoration-[#B9B9B9] underline-offset-4"
+												href={MEGA_MENU_CTA.href}
+												onClick={handleMenuLinkClick}
+											>
+												{MEGA_MENU_CTA.label}
+											</a>{" "}
+											and we can map your exact workflow.
 										</div>
 									</div>
 								</div>
@@ -428,7 +427,7 @@ export function Nav() {
 										</div>
 										<a
 											className="mt-4 inline-flex items-center gap-2 rounded-full bg-black px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#171717]"
-											href="#work"
+											href="/#work"
 											onClick={handleMenuLinkClick}
 										>
 											View featured work
@@ -473,7 +472,9 @@ export function Nav() {
 											<div className="flex gap-2 overflow-x-auto pb-1">
 												{industries.map((industry) => (
 													<button
-														className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold ${selectedIndustry.id === industry.id ? "border-black bg-black text-white" : "border-black/10 bg-white text-[#444]"}`}
+														className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold ${
+															selectedIndustry.id === industry.id ? "border-black bg-black text-white" : "border-black/10 bg-white text-[#444]"
+														}`}
 														key={industry.id}
 														onClick={() => setSelectedIndustryId(industry.id)}
 														type="button"
@@ -482,18 +483,30 @@ export function Nav() {
 													</button>
 												))}
 											</div>
-											<p className="px-1 text-xs text-[#666666]">{selectedIndustry.summary}</p>
-											<div className="max-h-64 space-y-2 overflow-y-auto pr-1">
-												{selectedIndustry.solutions.map((solution) => (
-													<a
-														className="block rounded-lg border border-black/10 bg-white px-3 py-3"
-														href={solution.href}
-														key={solution.title}
-														onClick={handleMenuLinkClick}
-													>
-														<p className="font-sans text-sm font-semibold text-[#121212]">{solution.title}</p>
-														<p className="mt-1 text-xs leading-[1.5] text-[#666666]">{solution.description}</p>
-													</a>
+											<div className="rounded-xl border border-black/10 bg-white px-3 py-2.5 text-xs leading-[1.5] text-[#666666]">
+												{selectedIndustry.summary}
+												<a className="ml-1 font-semibold text-[#111111] underline underline-offset-2" href={selectedIndustry.href} onClick={handleMenuLinkClick}>
+													View industry page
+												</a>
+											</div>
+											<div className="max-h-72 space-y-3 overflow-y-auto pr-1">
+												{selectedIndustry.groups.map((group) => (
+													<div className="rounded-lg border border-black/10 bg-[#F9F8F6] p-2.5" key={group.title}>
+														<p className="px-0.5 text-xs font-semibold uppercase tracking-[0.08em] text-[#666666]">{group.title}</p>
+														<div className="mt-2 space-y-2">
+															{group.solutions.map((solution) => (
+																<a
+																	className="block rounded-lg border border-black/10 bg-white px-3 py-3"
+																	href={solution.href}
+																	key={solution.href}
+																	onClick={handleMenuLinkClick}
+																>
+																	<p className="font-sans text-sm font-semibold text-[#121212]">{solution.title}</p>
+																	<p className="mt-1 text-xs leading-[1.5] text-[#666666]">{solution.description}</p>
+																</a>
+															))}
+														</div>
+													</div>
 												))}
 											</div>
 										</div>
@@ -551,7 +564,7 @@ export function Nav() {
 
 						<a
 							className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full bg-black px-4 py-2.5 text-sm font-medium text-white"
-							href="#estimate"
+							href="/#estimate"
 							onClick={handleMenuLinkClick}
 						>
 							<Sparkles className="size-4" strokeWidth={1.9} />
